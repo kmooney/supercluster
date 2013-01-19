@@ -1,0 +1,37 @@
+Supercluster Design Document
+================================
+
+Supercluster is a declaritive, configuration based system for defining 
+what your cluster's topology will look like.  It will read a yaml file and 
+then create the appropriate instances.  The yaml will include the 
+specifications of each cluster server, as well as details about the 
+security group or firewall configuration.
+
+For instance, a supercluster file may look like this:
+
+
+cluster_tier: small
+description: "This is the low level cluster.  It includes a medium 
+              webnode, a medium task worker, a database and a conductor."
+
+instances:
+    - size: m1.medium
+      name: web01
+      security: internal
+
+    - size: m1.medium
+      name: task01
+      security: internal
+
+    - size: m1.small
+      name: kiln
+      security: public 
+
+    - size: m1.medium
+      name: db01
+      security: internal
+    
+
+Each cluster yaml is the definition for a class of cluster, it does
+not define an instance of a cluster.
+
