@@ -1,15 +1,15 @@
 name: Web Cube Cloud
 description: The Web Cube Cloud Supercluster
 
-supercluster: 
+clusters: 
     - slug: rerun
-      cluster: small-tier
+      type: small-tier
    
     - slug: uemaxim
-      cluster: small-tier
+      type: small-tier
 
     - slug: manduka
-      cluster: mid-tier
+      type: mid-tier
 
     - slug: ibm
-      cluster: enterprise
+      type: enterprise-tier

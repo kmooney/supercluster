@@ -1,24 +1,24 @@
-slug: small-tier
+slug: mid-tier
 adapter: AWSAdapter
 description: "A small tier is a cluster that has an instance, a worker and a db."
 
 elements:
     - type: instance
       size: m1.large
-      name: web01
+      slug: web01
 
     - type: instance
       size: m1.large
-      name: web02
+      slug: web02
 
     - type: instance
       size: m1.medium
-      name: worker01
+      slug: worker01
 
     - type: db
       size: m1.medium
-      name: db01
+      slug: db01
     
     - type: instance
       size: m1.medium
-      name: bake
+      slug: bake
