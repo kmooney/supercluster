@@ -49,6 +49,9 @@ class AWSInstance(AWSClusterElement):
     Represents an EC2 Instance
     """
 
+    def am_i(self):
+        pass
+
     def __init__(self, *args, **kwargs):
         super(AWSInstance, self).__init__(*args, **kwargs)
 

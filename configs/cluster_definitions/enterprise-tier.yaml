@@ -1,0 +1,38 @@
+slug: enterprise-tier
+description: "A small tier is a cluster that has an instance, a worker and a db."
+
+elements:
+    - type: instance
+      size: m1.large
+      name: web01
+
+    - type: instance
+      size: m1.large
+      name: web02
+
+    - type: instance
+      size: m1.large
+      name: web03
+
+    - type: instance
+      size: m1.large
+      name: worker01
+
+    - type: instance
+      size: m1.large
+      name: worker02
+
+    - type: db
+      size: m1.large
+      name: db01
+
+    - type: db
+      size: m1.large
+      name: db02
+      connections:
+          - type: slave
+          - to: db01
+    
+    - type: instance
+      size: m1.medium
+      name: jump01
