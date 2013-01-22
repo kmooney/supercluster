@@ -1,4 +1,6 @@
 from copy import deepcopy
+import boto
+from exceptions import LoadBalanceException, InstanceException
 
 
 class ImproperlyConfigured(Exception):
@@ -24,7 +26,8 @@ class Cluster(object):
         for el in element_copy:
             el.slug = "{client_slug}-{element_slug}".format(
                 client_slug=slug,
-                element_slug=el.slug
+                element_slug=el.slug,
+                cluster=self
             )
 
         return Cluster(
@@ -81,7 +84,10 @@ class SuperCluster(object):
 class ClusterElement(object):
 
     def __init__(self, *args, **kwargs):
+        self.type = kwargs.pop('type', None)
         self.slug = kwargs.pop('slug', None)
+        self.cluster = kwargs.pop('cluster', None)
+        self.attributes = kwargs
         if self.slug is None:
             raise ImproperlyConfigured("ClusterElement must have slug")
 
@@ -116,10 +122,45 @@ class AWSClusterElement(ClusterElement):
 
 class AWSLoadBalancer(AWSClusterElement):
     """
-    Represents and EC2 Load Balancer
+    Represents and EC2 Load Balancer.
     """
 
+    def am_i(self):
+        """
+            Looks for a load balancer that has the following kvps:
+                1) cluster = self.cluster.name
+                2) slug = self.slug
+            If it can be found, returns True
+            Otherwise false.
+        """
+        lbs = self.connection.get_all_load_balancers([self.slug])
+        if len(lbs) > 1:
+            raise LoadBalanceException(
+                "Too many ELBs with slug: {slug}".format(slug=self.slug)
+            )
+        else:
+            return len(lbs) == 1
+
+    def make_me(self):
+        if self.am_i() is False:
+            # TODO Needs security groups
+            self.connection.create_load_balancer(
+                self.slug,
+                self.zones,
+                self.listeners
+            )
+        # TODO - Create & Register Instances
+
     def __init__(self, *args, **kwargs):
+        self.zones = kwargs.pop('zones', list())
+        # TODO - Process listeners
+        self.listeners = kwargs.pop(
+            'listeners',
+            [(80, 8000, "HTTP", ), ]
+        )
+        if len(self.zones) == 0:
+            raise LoadBalanceException("Load Balancer must have zones!")
+        self.connection = boto.connect_elb()
         super(AWSLoadBalancer, self).__init__(*args, **kwargs)
 
 
@@ -129,9 +170,34 @@ class AWSInstance(AWSClusterElement):
     """
 
     def am_i(self):
-        pass
+        filters = dict(('tag:slug', self.slug))
+        instances = self.connection.get_all_instances(filters=filters)
+        if len(instances) > 1:
+            raise InstanceException(
+                "Too many instances with slug {slug}".format(slug=self.slug)
+            )
+        else:
+            return len(instances) == 1
+
+    def make_me(self):
+        if not self.am_i():
+            # TODO Need security groups!
+            # TODO Need ssh key for cluster
+            reservation = self.connection.run_instances(self.ami)
+            instance = reservation[0]
+            self.connection.create_tags(
+                instance.id,
+                dict(('slug', self.slug, ))
+            )
 
     def __init__(self, *args, **kwargs):
+        self.connection = boto.connect_ec2()
+        self.ami = kwargs.pop('ami', None)
+        self.size = kwargs.pop('size', None)
+        if self.size is None:
+            raise InstanceException("Instance requires size")
+        if self.ami is None:
+            raise InstanceException("Instance requires AMI")
         super(AWSInstance, self).__init__(*args, **kwargs)
 
 
