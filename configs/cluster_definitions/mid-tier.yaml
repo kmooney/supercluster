@@ -6,14 +6,17 @@ elements:
     - type: instance
       size: m1.large
       slug: web01
+      ami: ami-c7b202ae
 
     - type: instance
       size: m1.large
       slug: web02
+      ami: ami-c7b202ae
 
     - type: instance
       size: m1.medium
       slug: worker01
+      ami: ami-c7b202ae
 
     - type: db
       size: m1.medium
@@ -21,4 +24,5 @@ elements:
     
     - type: instance
       size: m1.medium
-      slug: bake
+      slug: bakery
+      ami: ami-c7b202ae

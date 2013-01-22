@@ -5,22 +5,27 @@ elements:
     - type: instance
       size: m1.large
       slug: web01
+      ami: ami-c7b202ae
 
     - type: instance
       size: m1.large
       slug: web02
+      ami: ami-c7b202ae
 
     - type: instance
       size: m1.large
       slug: web03
+      ami: ami-c7b202ae
 
     - type: instance
       size: m1.large
       slug: worker01
+      ami: ami-c7b202ae
 
     - type: instance
       size: m1.large
       slug: worker02
+      ami: ami-c7b202ae
 
     - type: db
       size: m1.large
@@ -36,3 +41,4 @@ elements:
     - type: instance
       size: m1.medium
       slug: jump01
+      ami: ami-c7b202ae
