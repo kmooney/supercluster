@@ -4,3 +4,7 @@ class LoadBalanceException(Exception):
 
 class InstanceException(Exception):
     pass
+
+
+class RDSException(Exception):
+    pass

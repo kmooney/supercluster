@@ -1,6 +1,7 @@
 from copy import deepcopy
 import boto
-from exceptions import LoadBalanceException, InstanceException
+from exceptions import LoadBalanceException, InstanceException, RDSException
+from . import MYSQL_PASSWORD
 
 
 class ImproperlyConfigured(Exception):
@@ -201,13 +202,44 @@ class AWSInstance(AWSClusterElement):
         super(AWSInstance, self).__init__(*args, **kwargs)
 
 
-class AWSEBS(AWSClusterElement):
+class AWSRDS(AWSClusterElement):
     """
     Represents an EBS Volume
     """
 
+    def am_i(self):
+        instances = self.connection.get_all_dbinstances(instance_id=self.slug)
+        if len(instances) > 1:
+            raise RDSException("Too many RDSs with this slug!")
+        else:
+            return len(instances) == 1
+
+    def make_me(self):
+        if not self.am_i():
+            self.connection.create_dbinstance(
+                self.slug,
+                self.storage,
+                self.size,
+                self.username,
+                self.password,
+            )
+        pass
+
     def __init__(self, *args, **kwargs):
-        super(AWSEBS, self).__init__(*args, **kwargs)
+        self.connection = boto.rds.RDSConnection()
+        self.storage = kwargs.get('storage', None)
+        if self.storage is None:
+            raise RDSException("storage must be set")
+        self.size = kwargs.get('size', None)
+        if self.size is None:
+            raise RDSException("size must be set")
+        self.username = kwargs.get('username', 'mysql')
+        #TODO - Figure out how to make the db password
+        #       work per cluster or maybe per rds per
+        #       cluster.  Do not force it into the
+        #       cluster definition file!
+        self.password = kwargs.get('password', MYSQL_PASSWORD)
+        super(AWSRDS, self).__init__(*args, **kwargs)
 
 
 class AWSSecurityGroup(AWSClusterElement):
@@ -217,12 +249,3 @@ class AWSSecurityGroup(AWSClusterElement):
 
     def __init__(self, *args, **kwargs):
         super(AWSSecurityGroup, self).__init__(*args, **kwargs)
-
-
-class AWSRDS(AWSClusterElement):
-    """
-    Represents an RDS
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(AWSRDS, self).__init__(*args, **kwargs)

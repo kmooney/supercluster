@@ -1,5 +1,5 @@
-from model import AWSLoadBalancer, AWSEBS
-from model import AWSRDS, AWSInstance, AWSSecurityGroup
+from model import AWSLoadBalancer, AWSSecurityGroup
+from model import AWSRDS, AWSInstance
 
 
 class Adapter(object):
@@ -22,7 +22,6 @@ class AWSAdapter(Adapter):
 
     def _register_elements(self):
         self.mapping['elb'] = AWSLoadBalancer
-        self.mapping['security_group'] = AWSEBS
         self.mapping['instance'] = AWSInstance
         self.mapping['ebs'] = AWSSecurityGroup
         self.mapping['db'] = AWSRDS
