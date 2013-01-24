@@ -21,6 +21,7 @@ elements:
     - type: db
       size: m1.medium
       slug: db01
+      storage: 10
     
     - type: instance
       size: m1.medium

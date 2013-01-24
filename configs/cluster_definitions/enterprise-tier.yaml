@@ -30,10 +30,12 @@ elements:
     - type: db
       size: m1.large
       slug: db01
+      storage: 10 
 
     - type: db
       size: m1.large
       slug: db02
+      storage: 10 
       connections:
           - type: slave
           - to: db01

@@ -4,12 +4,24 @@ description: The Web Cube Cloud Supercluster
 clusters: 
     - slug: rerun
       type: small-tier
+      db:
+        user: mysql
+        password: eauGhuJkmN1
    
     - slug: uemaxim
       type: small-tier
+      db:
+        user: mysql
+        password: 9j3nvuJk
 
     - slug: manduka
       type: mid-tier
+      db:
+        user: mysql
+        password: JjkOpLi9
 
     - slug: ibm
       type: enterprise-tier
+      db:
+        user: mysql
+        password: JuLi37n35

@@ -34,7 +34,7 @@ class Reader(object):
 
         elements = data.pop('clusters', list())
         elements = [
-            self.configs[cluster['type']].reify(cluster['slug'])
+            self.configs[cluster['type']].reify(cluster['slug'], cluster['db'])
             for cluster in elements
         ]
         self.supercluster = SuperCluster(

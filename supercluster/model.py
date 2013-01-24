@@ -1,7 +1,6 @@
 from copy import deepcopy
 import boto
 from exceptions import LoadBalanceException, InstanceException, RDSException
-from . import MYSQL_PASSWORD
 
 
 class ImproperlyConfigured(Exception):
@@ -17,7 +16,7 @@ class Cluster(object):
         self.description = kwargs.pop('description')
         self.elements = kwargs.pop('elements', list())
 
-    def reify(self, slug):
+    def reify(self, slug, secrets):
         """
             This will return a cluster with elements
             bound to the supercluster config,
@@ -30,6 +29,9 @@ class Cluster(object):
                 element_slug=el.slug,
                 cluster=self
             )
+            el.real = True
+            el.user = secrets['user']
+            el.password = secrets['password']
 
         return Cluster(
             slug="{client_slug}-{cluster_slug}".format(
@@ -223,22 +225,15 @@ class AWSRDS(AWSClusterElement):
                 self.username,
                 self.password,
             )
-        pass
 
     def __init__(self, *args, **kwargs):
-        self.connection = boto.rds.RDSConnection()
+        self.connection = boto.connect_rds()
         self.storage = kwargs.get('storage', None)
         if self.storage is None:
             raise RDSException("storage must be set")
         self.size = kwargs.get('size', None)
         if self.size is None:
             raise RDSException("size must be set")
-        self.username = kwargs.get('username', 'mysql')
-        #TODO - Figure out how to make the db password
-        #       work per cluster or maybe per rds per
-        #       cluster.  Do not force it into the
-        #       cluster definition file!
-        self.password = kwargs.get('password', MYSQL_PASSWORD)
         super(AWSRDS, self).__init__(*args, **kwargs)
 
 
